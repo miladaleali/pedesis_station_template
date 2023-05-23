@@ -5,7 +5,7 @@ import os
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('PEDESIS_SETTINGS_MODULE', 'app.caisssa.settings')
+    os.environ.setdefault('PEDESIS_SETTINGS_MODULE', 'app.station.settings')
     try:
         from pedesis.management import execute_from_command_line
     except ImportError as exc:

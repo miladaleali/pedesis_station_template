@@ -8,5 +8,6 @@ def main() -> None:
     init_all_tables()
     logger.info("Initial data created")
 
+
 if __name__ == '__main__':
     main()
