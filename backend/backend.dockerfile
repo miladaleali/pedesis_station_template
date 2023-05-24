@@ -1,12 +1,12 @@
 FROM miladaleali/dev_python:latest as base
 
+ARG GIT_TOKEN_PEDESIS
+
 WORKDIR /app/
 
 COPY ./app /app
 
 ENV PYTHONPATH=/app
-
-ENV GIT_TOKEN_PEDESIS=
 
 RUN pip install git+https://${GIT_TOKEN_PEDESIS}@github.com/miladaleali/pedesis.git
 RUN pip install gevent

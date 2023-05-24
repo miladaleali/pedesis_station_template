@@ -22,9 +22,6 @@ services:
         env_file:
             - .env
         environment:
-            # - POSTGRES_USER=postgres
-            # - POSTGRES_PASSWORD=postgres
-            # - POSTGRES_DB=postgres
             - PGDATA=/var/lib/postgresql/data/pgdata
         volumes:
             - ./data:/var/lib/postgresql/data/pgdata
@@ -32,10 +29,9 @@ services:
 
     pgadmin:
         image: dpage/pgadmin4
-        networks:
-            - default
         depends_on:
-            - db
+            db:
+              condition: service_started
         env_file:
             - .env
         environment:
@@ -45,73 +41,59 @@ services:
             - "5050:80"
 
     backend:
-        image: '${DOCKER_IMAGE_BACKEND?Variable not set}'
-        depends_on:
-            - redis
-            - rabbitmq
-            - db
-        env_file:
-            - .env
-        environment:
-            - REDIS_HOST=redis
-            - RABBITMQ_HOST=rabbitmq
-            - POSTGRES_HOST=db
-            # - POSTGRES_USER=postgres
-            # - POSTGRES_PASSWORD=postgres
-            # - POSTGRES_DB=postgres
         build:
             context: ./backend
             dockerfile: backend.dockerfile
-            target: debug
-        links:
-            - redis
-            - rabbitmq
-            - db
-        volumes:
-            # - ./backend/app/alembic/versions:/app/alembic/versions
-            - ./backend/app:/app
-        ports:  
-            - 5678:5678
-        dns:
-            - 8.8.8.8
-            - 8.8.4.4
-        restart: on-failure
-
-    celery:
-        image: '${DOCKER_IMAGE_CELERYWORKER?Variable not set}'
+            target: prod
+            args:
+              GIT_TOKEN_PEDESIS: $GIT_TOKEN_PEDESIS
         depends_on:
-            - redis
-            - rabbitmq
-            - db
-        links:
-            - redis
-            - rabbitmq
-            - db
+            celery:
+              condition: service_started
         env_file:
             - .env
         environment:
             - REDIS_HOST=redis
             - RABBITMQ_HOST=rabbitmq
             - POSTGRES_HOST=db
-            # - POSTGRES_USER=postgres
-            # - POSTGRES_PASSWORD=postgres
-            # - POSTGRES_DB=postgres
-            - C_FORCE_ROOT=true
+        volumes:
+            - ./backend/app:/app
+        ports:  
+            - 5678:5678
+        restart: on-failure
+
+    celery:
         build:
             context: ./backend
             dockerfile: celeryworker.dockerfile
             target: prod
+            args:
+              GIT_TOKEN_PEDESIS: $GIT_TOKEN_PEDESIS
+        depends_on:
+            redis:
+              condition: service_started
+            rabbitmq:
+              condition: service_started
+            db:
+              condition: service_started
+        env_file:
+            - .env
+        environment:
+            - REDIS_HOST=redis
+            - RABBITMQ_HOST=rabbitmq
+            - POSTGRES_HOST=db
+            - C_FORCE_ROOT=true
         ports:
             - 5679:5679
-        dns:
-            - 8.8.8.8
-            - 8.8.4.4
         restart: always
 
-    # flower:
-    #     image: mher/flower
-    #     env_file:
-    #         - .env
+    flower:
+        image: mher/flower
+        env_file:
+            - .env
+        depends_on:
+            celery:
+              condition: service_started
 
 volumes:
     data:
