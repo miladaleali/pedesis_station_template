@@ -1,4 +1,4 @@
-FROM miladaleali/pedesis_prod_dev:latest as base
+FROM miladaleali/pedesis_prod_env:latest as base
 
 WORKDIR /app/
 
