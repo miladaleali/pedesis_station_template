@@ -10,7 +10,7 @@ attrs==22.1.0
 autopep8==1.7.0
 backcall==0.2.0
 billiard==3.6.4.0
-ccxt==1.92.89
+ccxt==3.1.7
 celery==5.2.7
 celery-redbeat==2.0.0
 certifi==2022.6.15
@@ -111,3 +111,6 @@ wrapt==1.14.1
 yarl==1.7.2
 zope.interface==5.4.0
 alembic
+structlog==22.3.0
+python-telegram-bot==20.3
+gevent==22.10.2
