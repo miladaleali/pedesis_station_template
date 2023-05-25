@@ -14,8 +14,8 @@ wait_seconds = 1
 @retry(
     stop=stop_after_attempt(max_tries),
     wait=wait_fixed(wait_seconds),
-    before=before_log(logger, logger.info.no),
-    after=after_log(logger, logger.warning.no),
+    # before=before_log(logger, logger.info.no),
+    # after=after_log(logger, logger.warning.no),
 )
 def init() -> None:
     try:
