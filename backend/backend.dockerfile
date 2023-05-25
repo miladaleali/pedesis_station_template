@@ -1,4 +1,4 @@
-FROM miladaleali/dev_python:latest as base
+FROM miladaleali/pedesis_prod_dev:latest as base
 
 ARG GIT_TOKEN_PEDESIS
 
