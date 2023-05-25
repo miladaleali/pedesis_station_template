@@ -12,7 +12,6 @@ RUN pip install \
     httpcore==0.17.1\
     httpx==0.24.1\
     Jinja2==3.0.3\
-    larch-pickle\
     Mako==1.2.4\
     pandocfilters==1.5.0\
     prometheus-client==0.13.1\
