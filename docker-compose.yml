@@ -87,13 +87,13 @@ services:
             - 5679:5679
         restart: always
 
-    flower:
-        image: mher/flower
-        env_file:
-            - .env
-        depends_on:
-            celery:
-              condition: service_started
+    # flower:
+    #     image: mher/flower
+    #     env_file:
+    #         - .env
+    #     depends_on:
+    #         celery:
+    #           condition: service_started
 
 volumes:
     data:
