@@ -14,7 +14,7 @@ services:
             - "5672:5672"
             - "15672:15672"
         healthcheck:
-          test: ["CMD", "rabbitmqctl", "status"]
+          test: rabbitmq-diagnostics -q ping
           interval: 10s
           timeout: 5s
           retries: 3
@@ -54,7 +54,7 @@ services:
               GIT_TOKEN_PEDESIS: $GIT_TOKEN_PEDESIS
         depends_on:
             celery:
-              condition: service_started
+              condition: service_healthy
         env_file:
             - .env
         environment:
@@ -90,6 +90,12 @@ services:
             - C_FORCE_ROOT=true
         ports:
             - 5679:5679
+        healthcheck:
+          test: celery inspect ping
+          interval: 30s
+          timeout: 10s
+          retries: 5
+
         restart: always
 
     # flower:
