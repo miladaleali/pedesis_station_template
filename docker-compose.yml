@@ -13,6 +13,11 @@ services:
         ports:
             - "5672:5672"
             - "15672:15672"
+        healthcheck:
+          test: ["CMD", "rabbitmqctl", "status"]
+          interval: 10s
+          timeout: 5s
+          retries: 3
         restart: always
 
     db:
@@ -73,7 +78,7 @@ services:
             redis:
               condition: service_started
             rabbitmq:
-              condition: service_started
+              condition: service_healthy
             db:
               condition: service_started
         env_file:
