@@ -1,18 +1,19 @@
 from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 
-from pedesis.logger import logger
+from pedesis.logger import get_logger
 from pedesis.shortcuts import get_db, get_settings
 
 max_tries = 60 * 5  # 5 minutes
 
 wait_seconds = 1
 
+logger = get_logger()
 
 @retry(
     stop=stop_after_attempt(max_tries),
     wait=wait_fixed(wait_seconds),
-    before=before_log(logger, logger.level('INFO').no),
-    after=after_log(logger, logger.level('WARNING').no),
+    before=before_log(logger, logger.info.no),
+    after=after_log(logger, logger.warning.no),
 )
 def init() -> None:
     try:
