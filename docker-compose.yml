@@ -13,17 +13,17 @@ services:
           retries: 3
         restart: always
 
-    # rabbitmq:
-    #     image: rabbitmq
-    #     ports:
-    #         - "5672:5672"
-    #         - "15672:15672"
-    #     healthcheck:
-    #       test: rabbitmq-diagnostics -q ping
-    #       interval: 10s
-    #       timeout: 5s
-    #       retries: 3
-    #     restart: always
+    rabbitmq:
+        image: rabbitmq
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        healthcheck:
+          test: rabbitmq-diagnostics -q ping
+          interval: 10s
+          timeout: 5s
+          retries: 3
+        restart: always
 
     db:
         image: postgres:15.1-alpine
@@ -84,8 +84,8 @@ services:
         depends_on:
             redis_memory:
               condition: service_healthy
-            # rabbitmq:
-            #   condition: service_healthy
+            rabbitmq:
+              condition: service_healthy
             db:
               condition: service_healthy
         env_file:
@@ -95,7 +95,7 @@ services:
             - RABBITMQ_HOST=rabbitmq
             - POSTGRES_HOST=db
             - C_FORCE_ROOT=true
-            - CELERY_BROKER_URL=redis://redis_memory:6379/5
+            - CELERY_BROKER_URL=amqp://rabbitmq:5672
             - CELERY_RESULT_BACKEND=redis://redis_memory:6379/1
         ports:
             - 5679:5679
@@ -112,6 +112,7 @@ services:
           - .env
       environment:
           - CELERY_BROKER_URL="amqp://${RABBITMQ_HOST}:5672"
+          - CELERY_RESULT_BACKEND="redis://redis_memory:6379/1"
       depends_on:
           celery:
             condition: service_healthy
