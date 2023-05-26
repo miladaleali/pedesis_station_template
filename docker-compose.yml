@@ -147,7 +147,7 @@ services:
         - 8080:8080
       network_mode: host
       volumes:
-        - /:/rootfs:ro
+        - /:/rootfs:ro, rslave
         - /var/run:/var/run:ro
         - /sys:/sys:ro
         - /var/lib/docker/:/var/lib/docker:ro
