@@ -109,6 +109,8 @@ services:
       image: mher/flower
       env_file:
           - .env
+      environment:
+          - CELERY_BROKER_URL="amqp://${RABBITMQ_HOST}:5672"
       depends_on:
           celery:
             condition: service_healthy
