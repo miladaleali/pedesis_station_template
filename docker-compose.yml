@@ -82,7 +82,7 @@ services:
             args:
               GIT_TOKEN_PEDESIS: $GIT_TOKEN_PEDESIS
         depends_on:
-            redis:
+            redis_memory:
               condition: service_healthy
             rabbitmq:
               condition: service_healthy
