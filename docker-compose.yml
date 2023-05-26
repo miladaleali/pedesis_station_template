@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
 
-    redis:
+    redis_memory:
         image: redis:alpine
         ports:
             - "6379:6379"
@@ -65,7 +65,7 @@ services:
         env_file:
             - .env
         environment:
-            - REDIS_HOST=redis
+            - REDIS_HOST=redis_memory
             - RABBITMQ_HOST=rabbitmq
             - POSTGRES_HOST=db
         volumes:
@@ -91,10 +91,12 @@ services:
         env_file:
             - .env
         environment:
-            - REDIS_HOST=redis
+            - REDIS_HOST=redis_memory
             - RABBITMQ_HOST=rabbitmq
             - POSTGRES_HOST=db
             - C_FORCE_ROOT=true
+            - CELERY_BROKER_URL=amqp://rabbitmq:5672
+            - CELERY_RESULT_BACKEND=redis://redis_memory:6379/1
         ports:
             - 5679:5679
         healthcheck:
