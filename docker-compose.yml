@@ -114,7 +114,7 @@ services:
             condition: service_healthy
       ports:
         - 8888:$FLOWER_PORT
-      voulumes:
+      volumes:
         - flower-data:/data
       command: celery flower --persisten=True
 
