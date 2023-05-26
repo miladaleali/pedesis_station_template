@@ -115,7 +115,7 @@ services:
       ports:
         - 8888:$FLOWER_PORT
       voulumes:
-        - flower_data:/data
+        - flower-data:/data
       command: celery flower --persisten=True
 
     prometheus:
@@ -178,10 +178,12 @@ services:
 
 volumes:
     data:
-    flower_data:
+      driver: local
+    flower-data:
       driver: local
     prometheus-data:
       driver: local
     grafana-data:
       driver: local
     portainer-data:
+      driver: local
