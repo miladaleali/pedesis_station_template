@@ -100,7 +100,7 @@ services:
         ports:
             - 5679:5679
         healthcheck:
-          test: celery inspect ping
+          test: celery -A pedesis.tasks_manager:manager inspect ping
           interval: 30s
           timeout: 10s
           retries: 5
