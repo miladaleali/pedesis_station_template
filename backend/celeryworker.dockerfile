@@ -33,4 +33,4 @@ ARG FLOWER_PORT
 
 RUN pip install flower
 
-CMD celery -A pedesis.tasks_manager:manager flower --port=${FLOWER_PORT} --persisten=True
+# CMD celery -A pedesis.tasks_manager:manager flower --port=${FLOWER_PORT} --persisten=True
