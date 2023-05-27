@@ -113,7 +113,7 @@ services:
           target: flower
           args:
             GIT_TOKEN_PEDESIS: $GIT_TOKEN_PEDESIS
-            FLOWER_PORT: 8888
+            FLOWER_PORT: 5555
       env_file:
           - .env
       environment:
@@ -125,86 +125,56 @@ services:
           celery:
             condition: service_healthy
       ports:
-        - 8888:8888
+        - 5555:5555
       volumes:
         - flower-data:/data
-      command: celery -A pedesis.tasks_manager:manager --broker=amqp://rabbitmq:5672 flower --persisten=True --port=8888
+      command: celery -A pedesis.tasks_manager:manager --broker=amqp://rabbitmq:5672 flower --persisten=True --port=5555
 
     prometheus:
-      image: prom/prometheus
-      restart: always
-      volumes:
-        - ./prometheus:/etc/prometheus/
-        - prometheus_data:/prometheus
-      command:
-        - '--config.file=/etc/prometheus/prometheus.yml'
-        - '--storage.tsdb.path=/prometheus'
-        - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-        - '--web.console.templates=/usr/share/prometheus/consoles'
+      image: prom/prometheus:latest
+      container_name: prometheus
       ports:
         - 9090:9090
-      links:
-        - cadvisor:cadvisor
-        - alertmanager:alertmanager
-      depends_on:
-        - cadvisor
-
-    node-exporter:
-      image: prom/node-exporter
       volumes:
-        - /proc:/host/proc:ro
-        - /sys:/host/sys:ro
-        - /:/rootfs:ro
-      command:
-        - '--path.procfs=/host/proc'
-        - '--path.sysfs=/host/sys'
-        - --collector.filesystem.ignored-mount-points
-        - '^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)'
-      ports:
-        - 9100:9100
-      restart: always
-      deploy:
-        mode: global
+        - ./prometheus:/etc/prometheus
+        - prometheus-data:/prometheus
+      command: "--config.file=/etc/prometheus/prometheus.yml"
+      restart: unless-stopped
 
-    alertmanager:
-      image: prom/alertmanager
-      restart: always
-      ports:
-        - 9093:9093
+    node_exporter:
+      image: quay.io/prometheus/node-exporter:v1.5.0
+      container_name: node_exporter
+      command: "--path.rootfs=/host"
+      pid: host
+      restart: unless-stopped
       volumes:
-        - ./alertmanager/:/etc/alertmanager/
-      command:
-        - '--config.file=/etc/alertmanager/config.yml'
-        - '--storage.path=/alertmanager'
+        - /:/host:ro,rslave
 
     cadvisor:
-      image: gcr.io/cadvisor/cadvisor
-      volumes:
-        - /:/rootfs:ro
-        - /var/run:/var/run:rw
-        - /sys:/sys:ro
-        - /var/lib/docker/:/var/lib/docker:ro
+      image: gcr.io/cadvisor/cadvisor:v0.47.0     
+      container_name: cadvisor
       ports:
         - 8080:8080
-      restart: always
-      deploy:
-        mode: global
+      network_mode: host
+      volumes:
+        - /:/rootfs:ro
+        - /var/run:/var/run:ro
+        - /sys:/sys:ro
+        - /var/lib/docker/:/var/lib/docker:ro
+        - /dev/disk/:/dev/disk:ro
+      devices:
+        - /dev/kmsg
+      privileged: true
+      restart: unless-stopped
 
     grafana:
-      image: grafana/grafana
-      user: '472'
-      restart: always
-      # environment:
-      #   GF_INSTALL_PLUGINS: 'grafana-clock-panel,grafana-simple-json-datasource'
-      volumes:
-        - grafana_data:/var/lib/grafana
-        - ./grafana/provisioning/:/etc/grafana/provisioning/
-      env_file:
-        - ./grafana/config.monitoring
+      image: grafana/grafana-oss:latest
+      container_name: grafana
       ports:
-        - 3000:3000
-      depends_on:
-        - prometheus
+        - "3000:3000"
+      volumes:
+        - grafana-data:/var/lib/grafana
+      restart: unless-stopped
 
     portainer:
       container_name: portainer
@@ -223,7 +193,9 @@ volumes:
       driver: local
     flower-data:
       driver: local
-    prometheus_data: {}
-    grafana_data: {}
+    prometheus-data:
+        driver: local
+    grafana-data:
+      driver: local
     portainer-data:
       driver: local
