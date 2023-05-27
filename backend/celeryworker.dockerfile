@@ -27,3 +27,10 @@ COPY ./app/worker-start.sh /worker-start.sh
 RUN chmod +x /worker-start.sh
 
 CMD bash /worker-start.sh
+######################## START NEW IMAGE: PRODUCTION ##########################
+FROM base as flower
+ARG FLOWER_PORT
+
+RUN pip install flower
+
+CMD celery -A pedesis.tasks_manager:manager flower --port=${FLOWER_PORT} --persisten=True
