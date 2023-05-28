@@ -151,21 +151,17 @@ services:
         - /:/host:ro,rslave
 
     cadvisor:
-      image: gcr.io/cadvisor/cadvisor:v0.47.0     
+      image: gcr.io/cadvisor/cadvisor:latest
       container_name: cadvisor
       ports:
-        - 8080:8080
-      network_mode: host
+      - 8080:8080
       volumes:
-        - /:/rootfs:ro
-        - /var/run:/var/run:ro
-        - /sys:/sys:ro
-        - /var/lib/docker/:/var/lib/docker:ro
-        - /dev/disk/:/dev/disk:ro
-      devices:
-        - /dev/kmsg
-      privileged: true
-      restart: unless-stopped
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      depends_on:
+      - redis_memory
 
     grafana:
       image: grafana/grafana-oss:latest
