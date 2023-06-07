@@ -253,10 +253,9 @@ def upgrade() -> None:
                     )
     op.create_table('srl',
                     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-                    sa.Column('srls_id', sa.Integer(), nullable=True),
+                    sa.Column('signal_engine_signature', sa.String(), nullable=False),
                     sa.Column('timeframe', sa.String(), nullable=True),
                     sa.Column('calculator', sa.String(), nullable=True),
-                    sa.ForeignKeyConstraint(['srls_id'], ['srls.id'], onupdate='CASCADE', ondelete='CASCADE'),
                     sa.PrimaryKeyConstraint('id'),
                     sa.UniqueConstraint('id')
                     )
@@ -340,8 +339,10 @@ def upgrade() -> None:
                     )
     op.create_table('srline',
                     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+                    sa.Column('srls_id', sa.Integer(), nullable=True),
                     sa.Column('srline_raw_id', sa.Integer(), nullable=True),
                     sa.Column('srlevel_id', sa.Integer(), nullable=True),
+                    sa.ForeignKeyConstraint(['srls_id'], ['srls.id'], onupdate='CASCADE', ondelete='CASCADE'),
                     sa.ForeignKeyConstraint(['srline_raw_id'], ['srline_raw.id'], onupdate='CASCADE', ondelete='CASCADE'),
                     sa.ForeignKeyConstraint(['srlevel_id'], ['srlevel.id'], onupdate='CASCADE', ondelete='CASCADE'),
                     sa.PrimaryKeyConstraint('id'),
